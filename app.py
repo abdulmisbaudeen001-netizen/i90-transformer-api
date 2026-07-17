@@ -1,41 +1,166 @@
+"""
+==========================================================
+i90 Transformer Prediction Server
+Production Version 1.0
+
+Receives:
+    token_sequence (8 × 8 integer matrix)
+
+Returns:
+    BUY
+    SELL
+    NO_TRADE
+
+Framework:
+    Flask
+    PyTorch
+
+Author:
+    i90 Transformer Engine
+
+==========================================================
+"""
+
 import os
 import json
+import logging
+
+from typing import Any
+from typing import Dict
+
 import torch
 import torch.nn as nn
-from flask import Flask, request, jsonify
+
+from flask import Flask
+from flask import jsonify
+from flask import request
+
 from flask_cors import CORS
 
-# =====================================================
-# CONFIG
-# =====================================================
+############################################################
+# LOGGING
+############################################################
 
-MODEL_PATH = "models/best_transformer_model.pt"
-CONFIG_PATH = "models/model_configuration.json"
-TOKEN_PATH = "tokens/token_dictionary.json"
-THRESHOLD_PATH = "models/optimized_thresholds.json"
+logging.basicConfig(
 
-DEVICE = torch.device("cpu")
+    level=logging.INFO,
 
-# =====================================================
-# LOAD CONFIG
-# =====================================================
+    format="%(asctime)s | %(levelname)s | %(message)s"
 
-with open(CONFIG_PATH, "r") as f:
-    CONFIG = json.load(f)
-
-with open(TOKEN_PATH, "r") as f:
-    TOKEN_DICT = json.load(f)
-
-with open(THRESHOLD_PATH, "r") as f:
-    THRESHOLD = json.load(f)
-
-CONFIDENCE_THRESHOLD = float(
-    THRESHOLD.get("optimal_threshold", 0.55)
 )
 
-# =====================================================
-# MODEL
-# =====================================================
+logger = logging.getLogger("TransformerAPI")
+
+############################################################
+# DEVICE
+############################################################
+
+DEVICE = torch.device(
+
+    "cuda"
+
+    if torch.cuda.is_available()
+
+    else
+
+    "cpu"
+
+)
+
+logger.info(f"Running on {DEVICE}")
+
+############################################################
+# PATHS
+############################################################
+
+BASE_DIR = os.path.dirname(
+
+    os.path.abspath(__file__)
+
+)
+
+MODEL_PATH = os.path.join(
+
+    BASE_DIR,
+
+    "best_transformer_model.pt"
+
+)
+
+CONFIG_PATH = os.path.join(
+
+    BASE_DIR,
+
+    "model_configuration.json"
+
+)
+
+TOKEN_PATH = os.path.join(
+
+    BASE_DIR,
+
+    "token_dictionary.json"
+
+)
+
+THRESHOLD_PATH = os.path.join(
+
+    BASE_DIR,
+
+    "optimized_thresholds.json"
+
+)
+
+############################################################
+# LOAD JSON
+############################################################
+
+def load_json(path: str):
+
+    with open(path, "r") as f:
+
+        return json.load(f)
+
+CONFIG = load_json(CONFIG_PATH)
+
+TOKEN_DICTIONARY = load_json(TOKEN_PATH)
+
+THRESHOLDS = load_json(THRESHOLD_PATH)
+
+CONFIDENCE_THRESHOLD = float(
+
+    THRESHOLDS.get(
+
+        "optimal_threshold",
+
+        0.55
+
+    )
+
+)
+
+logger.info("Configuration Loaded")
+
+logger.info(
+
+    f"Vocabulary Size : {CONFIG['vocab_size']}"
+
+)
+
+logger.info(
+
+    f"Sequence Length : {CONFIG['max_seq_len']}"
+
+)
+
+logger.info(
+
+    f"Confidence Threshold : {CONFIDENCE_THRESHOLD}"
+
+)
+############################################################
+# TRANSFORMER MODEL
+############################################################
 
 class TransformerClassifier(nn.Module):
 
@@ -43,178 +168,145 @@ class TransformerClassifier(nn.Module):
 
         super().__init__()
 
+        # ----------------------------------------------------
+        # Token Embedding
+        # ----------------------------------------------------
+
         self.embedding = nn.Embedding(
-            CONFIG["vocab_size"],
-            CONFIG["d_model"]
+
+            num_embeddings=CONFIG["vocab_size"],
+
+            embedding_dim=CONFIG["d_model"]
+
         )
 
-        self.position = nn.Parameter(
+        # ----------------------------------------------------
+        # Learnable Positional Embedding
+        # ----------------------------------------------------
+
+        self.position_embedding = nn.Parameter(
+
             torch.randn(
+
                 1,
+
                 CONFIG["max_seq_len"],
+
                 CONFIG["d_model"]
+
             )
+
         )
+
+        # ----------------------------------------------------
+        # Transformer Encoder Layer
+        # ----------------------------------------------------
 
         encoder_layer = nn.TransformerEncoderLayer(
+
             d_model=CONFIG["d_model"],
+
             nhead=CONFIG["n_heads"],
+
             dim_feedforward=CONFIG["d_ff"],
+
             dropout=CONFIG["dropout"],
-            activation=CONFIG.get("activation", "gelu"),
+
+            activation=CONFIG.get(
+
+                "activation",
+
+                "gelu"
+
+            ),
+
             batch_first=True,
-            norm_first=True,
+
+            norm_first=True
+
         )
+
+        # ----------------------------------------------------
+        # Transformer Encoder
+        # ----------------------------------------------------
 
         self.encoder = nn.TransformerEncoder(
+
             encoder_layer,
-            CONFIG["n_layers"]
+
+            num_layers=CONFIG["n_layers"]
+
         )
 
-        self.classifier = nn.Linear(
-            CONFIG["d_model"],
-            CONFIG["num_classes"]
+        # ----------------------------------------------------
+        # Layer Normalization
+        # ----------------------------------------------------
+
+        self.norm = nn.LayerNorm(
+
+            CONFIG["d_model"]
+
         )
+
+        # ----------------------------------------------------
+        # Classification Head
+        # ----------------------------------------------------
+
+        self.classifier = nn.Sequential(
+
+            nn.Linear(
+
+                CONFIG["d_model"],
+
+                CONFIG["d_model"] // 2
+
+            ),
+
+            nn.GELU(),
+
+            nn.Dropout(
+
+                CONFIG["dropout"]
+
+            ),
+
+            nn.Linear(
+
+                CONFIG["d_model"] // 2,
+
+                CONFIG["num_classes"]
+
+            )
+
+        )
+
+    # ========================================================
+    # Forward
+    # ========================================================
 
     def forward(self, x):
 
+        # x shape:
+        # (batch, seq_len)
+
         x = self.embedding(x)
 
-        x = x + self.position[:, :x.size(1), :]
+        x = x + self.position_embedding[:, :x.size(1), :]
 
         x = self.encoder(x)
 
-        x = x.mean(dim=1)
+        x = self.norm(x)
 
-        return self.classifier(x)
+        # Mean Pooling
 
-# =====================================================
-# LOAD MODEL
-# =====================================================
+        x = torch.mean(
 
-model = TransformerClassifier()
+            x,
 
-model.load_state_dict(
-    torch.load(
-        MODEL_PATH,
-        map_location=DEVICE
-    )
-)
+            dim=1
 
-model.eval()
+        )
 
-print("Transformer loaded successfully.")
+        logits = self.classifier(x)
 
-# =====================================================
-# APP
-# =====================================================
-
-app = Flask(__name__)
-CORS(app)
-
-# =====================================================
-# HEALTH
-# =====================================================
-
-@app.route("/health", methods=["GET"])
-def health():
-
-    return jsonify({
-        "status": "ok",
-        "model": "Transformer V3",
-        "threshold": CONFIDENCE_THRESHOLD
-    })
-
-# =====================================================
-# PREDICT
-# =====================================================
-
-@app.route("/predict", methods=["POST"])
-def predict():
-
-    try:
-
-        payload = request.get_json(force=True)
-
-        token_sequence = payload.get("token_sequence")
-
-        if token_sequence is None:
-
-            return jsonify({
-                "error": "token_sequence missing"
-            }), 400
-
-        x = torch.tensor(
-            token_sequence,
-            dtype=torch.long
-        ).unsqueeze(0)
-
-        with torch.no_grad():
-
-            logits = model(x)
-
-            probs = torch.softmax(
-                logits,
-                dim=1
-            )[0]
-
-        p_down = float(probs[0])
-        p_up = float(probs[1])
-
-        if p_up >= CONFIDENCE_THRESHOLD:
-
-            action = "BUY"
-            confidence = p_up
-
-        elif p_down >= CONFIDENCE_THRESHOLD:
-
-            action = "SELL"
-            confidence = p_down
-
-        else:
-
-            action = "NO_TRADE"
-            confidence = max(
-                p_up,
-                p_down
-            )
-
-        return jsonify({
-
-            "action": action,
-
-            "confidence": round(
-                confidence,
-                4
-            ),
-
-            "p_up": round(
-                p_up,
-                4
-            ),
-
-            "p_down": round(
-                p_down,
-                4
-            )
-
-        })
-
-    except Exception as e:
-
-        return jsonify({
-            "error": str(e)
-        }), 500
-
-# =====================================================
-
-if __name__ == "__main__":
-
-    port = int(
-        os.environ.get("PORT", 5000)
-    )
-
-    app.run(
-        host="0.0.0.0",
-        port=port
-    )
+        return logits
