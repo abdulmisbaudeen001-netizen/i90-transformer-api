@@ -1,0 +1,13 @@
+{
+    "vocab_size": 35,
+    "max_seq_len": 8,
+    "d_model": 256,
+    "n_heads": 8,
+    "n_layers": 4,
+    "d_ff": 1024,
+    "dropout": 0.1,
+    "activation": "gelu",
+    "num_classes": 2,
+    "use_positional": true,
+    "positional_type": "learnable"
+}

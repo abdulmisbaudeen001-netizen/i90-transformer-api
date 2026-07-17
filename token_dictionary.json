@@ -1,0 +1,212 @@
+{
+    "BULLISH_STRUCTURE": {
+        "id": 0,
+        "name": "BULLISH_STRUCTURE",
+        "category": "STRUCTURE",
+        "description": "Semantic token representing bullish structure"
+    },
+    "CONFIDENCE_HIGH": {
+        "id": 1,
+        "name": "CONFIDENCE_HIGH",
+        "category": "CONFIDENCE",
+        "description": "Semantic token representing confidence high"
+    },
+    "CONFIDENCE_LOW": {
+        "id": 2,
+        "name": "CONFIDENCE_LOW",
+        "category": "CONFIDENCE",
+        "description": "Semantic token representing confidence low"
+    },
+    "CONFIDENCE_MEDIUM": {
+        "id": 3,
+        "name": "CONFIDENCE_MEDIUM",
+        "category": "CONFIDENCE",
+        "description": "Semantic token representing confidence medium"
+    },
+    "CONTEXT_BREAKOUT": {
+        "id": 4,
+        "name": "CONTEXT_BREAKOUT",
+        "category": "CONTEXT",
+        "description": "Semantic token representing context breakout"
+    },
+    "CONTEXT_CONSOLIDATION": {
+        "id": 5,
+        "name": "CONTEXT_CONSOLIDATION",
+        "category": "CONTEXT",
+        "description": "Semantic token representing context consolidation"
+    },
+    "CONTEXT_PULLBACK": {
+        "id": 6,
+        "name": "CONTEXT_PULLBACK",
+        "category": "CONTEXT",
+        "description": "Semantic token representing context pullback"
+    },
+    "CONTEXT_TREND_MODERATE": {
+        "id": 7,
+        "name": "CONTEXT_TREND_MODERATE",
+        "category": "CONTEXT",
+        "description": "Semantic token representing context trend moderate"
+    },
+    "CONTEXT_UNKNOWN": {
+        "id": 8,
+        "name": "CONTEXT_UNKNOWN",
+        "category": "CONTEXT",
+        "description": "Semantic token representing context unknown"
+    },
+    "MARKET_ENERGY_HIGH": {
+        "id": 9,
+        "name": "MARKET_ENERGY_HIGH",
+        "category": "MARKET",
+        "description": "Semantic token representing market energy high"
+    },
+    "MARKET_ENERGY_LOW": {
+        "id": 10,
+        "name": "MARKET_ENERGY_LOW",
+        "category": "MARKET",
+        "description": "Semantic token representing market energy low"
+    },
+    "MARKET_ENERGY_MEDIUM": {
+        "id": 11,
+        "name": "MARKET_ENERGY_MEDIUM",
+        "category": "MARKET",
+        "description": "Semantic token representing market energy medium"
+    },
+    "MODERATE_BUYER_PRESSURE": {
+        "id": 12,
+        "name": "MODERATE_BUYER_PRESSURE",
+        "category": "PRESSURE",
+        "description": "Semantic token representing moderate buyer pressure"
+    },
+    "MODERATE_MOMENTUM": {
+        "id": 13,
+        "name": "MODERATE_MOMENTUM",
+        "category": "PRESSURE",
+        "description": "Semantic token representing moderate momentum"
+    },
+    "MODERATE_SELLER_PRESSURE": {
+        "id": 14,
+        "name": "MODERATE_SELLER_PRESSURE",
+        "category": "PRESSURE",
+        "description": "Semantic token representing moderate seller pressure"
+    },
+    "MOMENTUM_ACCELERATING": {
+        "id": 15,
+        "name": "MOMENTUM_ACCELERATING",
+        "category": "MOMENTUM",
+        "description": "Semantic token representing momentum accelerating"
+    },
+    "MOMENTUM_DECELERATING": {
+        "id": 16,
+        "name": "MOMENTUM_DECELERATING",
+        "category": "MOMENTUM",
+        "description": "Semantic token representing momentum decelerating"
+    },
+    "NOISE_HIGH": {
+        "id": 17,
+        "name": "NOISE_HIGH",
+        "category": "NOISE",
+        "description": "Semantic token representing noise high"
+    },
+    "NOISE_LOW": {
+        "id": 18,
+        "name": "NOISE_LOW",
+        "category": "NOISE",
+        "description": "Semantic token representing noise low"
+    },
+    "NOISE_MEDIUM": {
+        "id": 19,
+        "name": "NOISE_MEDIUM",
+        "category": "NOISE",
+        "description": "Semantic token representing noise medium"
+    },
+    "PRESSURE_BALANCED": {
+        "id": 20,
+        "name": "PRESSURE_BALANCED",
+        "category": "CONTEXT",
+        "description": "Semantic token representing pressure balanced"
+    },
+    "PRESSURE_EXHAUSTION": {
+        "id": 21,
+        "name": "PRESSURE_EXHAUSTION",
+        "category": "CONTEXT",
+        "description": "Semantic token representing pressure exhaustion"
+    },
+    "PRESSURE_REVERSAL": {
+        "id": 22,
+        "name": "PRESSURE_REVERSAL",
+        "category": "CONTEXT",
+        "description": "Semantic token representing pressure reversal"
+    },
+    "SIDEWAYS_STRUCTURE": {
+        "id": 23,
+        "name": "SIDEWAYS_STRUCTURE",
+        "category": "STRUCTURE",
+        "description": "Semantic token representing sideways structure"
+    },
+    "STRONG_BUYER_PRESSURE": {
+        "id": 24,
+        "name": "STRONG_BUYER_PRESSURE",
+        "category": "PRESSURE",
+        "description": "Semantic token representing strong buyer pressure"
+    },
+    "STRONG_SELLER_PRESSURE": {
+        "id": 25,
+        "name": "STRONG_SELLER_PRESSURE",
+        "category": "PRESSURE",
+        "description": "Semantic token representing strong seller pressure"
+    },
+    "VOLATILITY_COMPRESSION": {
+        "id": 26,
+        "name": "VOLATILITY_COMPRESSION",
+        "category": "VOLATILITY",
+        "description": "Semantic token representing volatility compression"
+    },
+    "VOLATILITY_EXPANSION": {
+        "id": 27,
+        "name": "VOLATILITY_EXPANSION",
+        "category": "VOLATILITY",
+        "description": "Semantic token representing volatility expansion"
+    },
+    "VOLATILITY_EXTREME": {
+        "id": 28,
+        "name": "VOLATILITY_EXTREME",
+        "category": "VOLATILITY",
+        "description": "Semantic token representing volatility extreme"
+    },
+    "VOLATILITY_HIGH": {
+        "id": 29,
+        "name": "VOLATILITY_HIGH",
+        "category": "VOLATILITY",
+        "description": "Semantic token representing volatility high"
+    },
+    "VOLATILITY_LOW": {
+        "id": 30,
+        "name": "VOLATILITY_LOW",
+        "category": "VOLATILITY",
+        "description": "Semantic token representing volatility low"
+    },
+    "VOLATILITY_NORMAL": {
+        "id": 31,
+        "name": "VOLATILITY_NORMAL",
+        "category": "VOLATILITY",
+        "description": "Semantic token representing volatility normal"
+    },
+    "WEAK_BUYER_PRESSURE": {
+        "id": 32,
+        "name": "WEAK_BUYER_PRESSURE",
+        "category": "PRESSURE",
+        "description": "Semantic token representing weak buyer pressure"
+    },
+    "WEAK_MOMENTUM": {
+        "id": 33,
+        "name": "WEAK_MOMENTUM",
+        "category": "PRESSURE",
+        "description": "Semantic token representing weak momentum"
+    },
+    "WEAK_SELLER_PRESSURE": {
+        "id": 34,
+        "name": "WEAK_SELLER_PRESSURE",
+        "category": "PRESSURE",
+        "description": "Semantic token representing weak seller pressure"
+    }
+}
