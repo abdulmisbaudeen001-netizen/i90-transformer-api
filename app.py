@@ -113,7 +113,15 @@ model.eval()
 log.info("Model loaded successfully.")
 
 app = Flask(__name__)
-CORS(app)
+
+# Fix: explicitly allow all origins, methods including OPTIONS, and Content-Type header.
+# Default CORS(app) does not intercept OPTIONS preflight on POST-only routes,
+# causing 405 → Render 502 before the request reaches Flask.
+CORS(app, resources={r"/*": {
+    "origins":  "*",
+    "methods":  ["GET", "POST", "OPTIONS"],
+    "allow_headers": ["Content-Type"]
+}})
 
 log.info("Flask server initialized.")
 
@@ -130,9 +138,14 @@ def health():
     })
 
 
-@app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["POST", "OPTIONS"])
 def predict():
+    # Handle CORS preflight explicitly — flask_cors may not catch it on POST-only routes
+    if request.method == "OPTIONS":
+        return "", 204
+
     try:
+        # force=True: parses JSON regardless of Content-Type (handles text/plain from extension)
         payload = request.get_json(force=True)
 
         if payload is None:
@@ -206,3 +219,4 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     log.info(f"Listening on port {port}")
     app.run(host="0.0.0.0", port=port)
+        
