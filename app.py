@@ -97,19 +97,27 @@ class MarketTransformer(nn.Module):
 
 
 log.info("Loading trained model...")
+log.info(f"Model path: {MODEL_PATH}")
+log.info(f"File exists: {os.path.exists(MODEL_PATH)}")
+log.info(f"File size: {os.path.getsize(MODEL_PATH) if os.path.exists(MODEL_PATH) else 'N/A'} bytes")
 
 model = MarketTransformer(CONFIG)
+log.info("MarketTransformer architecture instantiated.")
 
-checkpoint = torch.load(MODEL_PATH, map_location=DEVICE)
+# weights_only=False required for PyTorch >= 2.0 with legacy checkpoints.
+# Without this, torch.load may hang or raise UnpicklingError on CPU.
+checkpoint = torch.load(MODEL_PATH, map_location=DEVICE, weights_only=False)
+log.info("Checkpoint loaded from disk.")
 
 if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
     model.load_state_dict(checkpoint["model_state_dict"])
+    log.info("State dict loaded from checkpoint dict.")
 else:
     model.load_state_dict(checkpoint)
+    log.info("State dict loaded directly.")
 
 model.to(DEVICE)
 model.eval()
-
 log.info("Model loaded successfully.")
 
 app = Flask(__name__)
@@ -207,3 +215,4 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     log.info(f"Listening on port {port}")
     app.run(host="0.0.0.0", port=port)
+        
